@@ -19,7 +19,9 @@ enum editorKey{
   ARROW_UP,
   ARROW_DOWN,
   PAGE_UP,
-  PAGE_DOWN
+  PAGE_DOWN,
+  HOME_KEY,
+  END_KEY
 };
 
 /*** data ***/
@@ -81,8 +83,12 @@ int editorReadKey(){
         if(read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
         if(seq[2] == '~'){
           switch(seq[1]){
+            case '1': return HOME_KEY;
+            case '4': return END_KEY;
             case '5': return PAGE_UP;
             case '6': return PAGE_DOWN;
+            case '7': return HOME_KEY;
+            case '8': return END_KEY;
           }
         }
       }
@@ -92,9 +98,16 @@ int editorReadKey(){
           case 'B': return ARROW_DOWN;
           case 'C': return ARROW_RIGHT;
           case 'D': return ARROW_LEFT;
+          case 'H': return HOME_KEY;
+          case 'F': return END_KEY;
         }
       }
-        
+    }
+    else if(seq[0] == 'O'){
+      switch(seq[1]){
+        case 'H': return HOME_KEY;
+        case 'F': return END_KEY;
+      }
     }
   }
   return c;
@@ -191,7 +204,7 @@ void editorRefreshScreen(){
   editorDrawRows(&ab);
 
   char buffer[32];
-  snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", E.cx + 1, E.cy + 1);
+  snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
   abAppend(&ab, buffer, strlen(buffer));
   abAppend(&ab, "\x1b[?25h", 6);
 
@@ -204,23 +217,23 @@ void editorRefreshScreen(){
 void editorMoveCursor(int key){
   switch(key){
     case ARROW_UP:
-      if(E.cx != 0){
-        E.cx--;
-      }
-      break;
-    case ARROW_LEFT:
       if(E.cy != 0){
         E.cy--;
       }
       break;
+    case ARROW_LEFT:
+      if(E.cx != 0){
+        E.cx--;
+      }
+      break;
     case ARROW_DOWN:
-      if(E.cx != E.screenrows - 1){
-        E.cx++;
+      if(E.cy != E.screenrows - 1){
+        E.cy++;
       }
       break;
     case ARROW_RIGHT:
-      if(E.cy != E.screencols - 1){
-        E.cy++;
+      if(E.cx != E.screencols - 1){
+        E.cx++;
       }
       break;
   } 
@@ -234,6 +247,12 @@ void editorProcessKeyPress(){
       write(STDOUT_FILENO, "\x1b[2J", 4);
       write(STDOUT_FILENO, "\x1b[H", 3);
       exit(0);
+      break;
+    case HOME_KEY:
+      E.cx = 0;
+      break;
+    case END_KEY:
+      E.cx = E.screencols - 1;
       break;
     case PAGE_UP:
     case PAGE_DOWN:
