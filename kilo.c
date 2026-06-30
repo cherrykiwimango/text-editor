@@ -21,7 +21,8 @@ enum editorKey{
   PAGE_UP,
   PAGE_DOWN,
   HOME_KEY,
-  END_KEY
+  END_KEY,
+  DEL_KEY
 };
 
 /*** data ***/
@@ -84,6 +85,7 @@ int editorReadKey(){
         if(seq[2] == '~'){
           switch(seq[1]){
             case '1': return HOME_KEY;
+            case '3': return DEL_KEY;
             case '4': return END_KEY;
             case '5': return PAGE_UP;
             case '6': return PAGE_DOWN;
