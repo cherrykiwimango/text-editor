@@ -255,13 +255,10 @@ void editorProcessKeyPress(){
       E.cx = E.screencols - 1;
       break;
     case PAGE_UP:
+      E.cy = 0;
+      break;
     case PAGE_DOWN:
-      {
-        int times = E.screenrows;
-        while(times--){
-          editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
-        }
-      }
+      E.cy = E.screenrows - 1;
       break;
     case ARROW_UP:
     case ARROW_DOWN:
