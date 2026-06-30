@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
@@ -13,8 +14,8 @@
 /*** data ***/
 
 struct editorConfig{
-  struct termios E.orig_termios;
-}
+  struct termios orig_termios;
+};
 
 struct editorConfig E;
 
