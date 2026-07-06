@@ -299,6 +299,11 @@ void editorMoveCursor(int key){
         E.cx--;
         E.verticalcx = E.cx;
       }
+      else if(E.cy > 0){
+        E.cy--;
+        E.cx = E.row[E.cy].size;
+        E.verticalcx = E.cx;
+      }
       break;
     case ARROW_DOWN:
       if(E.cy < E.numrows - 1){
