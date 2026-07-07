@@ -315,6 +315,11 @@ void editorMoveCursor(int key){
         E.cx++;
         E.verticalcx = E.cx;
       }
+      else if(row && E.cx == row->size){
+        E.cy++;
+        E.cx = 0;
+        E.verticalcx = E.cx;
+      }
       break;
   } 
   row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
