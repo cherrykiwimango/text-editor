@@ -42,6 +42,7 @@ typedef struct erow{
 
 struct editorConfig{
   int cx, cy, verticalcx;
+  int rx;
   int rowoff;
   int coloff;
   int screenrows;
@@ -165,6 +166,17 @@ int getWindowSize(int *rows, int *cols){
 
 /*** row operations ***/
 
+int editorRowCxToRx(erow *row, int cx){
+  int rx=0;
+  for(int i=0; i<cx; i++){
+    if(row->chars[i] == '\t'){
+      rx += (KILO_TAB_STOP - 1) - (rx % KILO_TAB_STOP);
+    }
+    rx++;
+  }
+  return rx;
+}
+
 void editorUpdateRow(erow *row){
   int tabs = 0;
   for(int j=0; j<row->size; j++)
@@ -245,17 +257,22 @@ void abFree(struct abuf *ab){
 /*** output ***/
 
 void editorScroll(){
+  E.rx = 0;
+  if(E.cy < E.numrows){
+    E.rx = editorRowCxToRx(&E.row[E.cy], E.cx);
+  }
+
   if(E.cy < E.rowoff){
     E.rowoff = E.cy;
   }
   if(E.cy >= E.rowoff + E.screenrows){
     E.rowoff = E.cy - E.screenrows + 1;
   }
-  if(E.cx >= E.coloff + E.screencols){
-    E.coloff = E.cx - E.screencols + 1;
+  if(E.rx >= E.coloff + E.screencols){
+    E.coloff = E.rx - E.screencols + 1;
   }
-  if(E.cx < E.coloff){
-    E.coloff = E.cx;
+  if(E.rx < E.coloff){
+    E.coloff = E.rx;
   }
 }
 
@@ -304,7 +321,7 @@ void editorRefreshScreen(){
   editorDrawRows(&ab);
 
   char buffer[32];
-  snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.cx - E.coloff) + 1);
+  snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
   abAppend(&ab, buffer, strlen(buffer));
   abAppend(&ab, "\x1b[?25h", 6);
 
@@ -392,6 +409,7 @@ void editorProcessKeyPress(){
 void initEditor(){
   E.cx = 0;
   E.cy = 0;
+  E.rx = 0;
   E.rowoff= 0;
   E.numrows = 0;
   E.row = NULL;
