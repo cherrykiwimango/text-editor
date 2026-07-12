@@ -316,11 +316,15 @@ void editorDrawRows(struct abuf *ab){
 
 void editorDrawStatusBar(struct abuf *ab){
   abAppend(ab, "\x1b[7m", 4);
-  int len = 0;
-  while (len < E.screencols) {
+  char status[80];
+  int len = snprintf(status, sizeof(status), " %.20s - %d lines", E.filename? E.filename : "[No Name]", E.numrows);
+  abAppend(ab, status, len);
+  int endLen = snprintf(status, sizeof(status), "%d/%d ", E.cy+1, E.numrows);
+  while (len < E.screencols - endLen) {
     abAppend(ab, " ", 1);
     len++;
   }
+  abAppend(ab, status, endLen);
   abAppend(ab, "\x1b[m", 3);
 }
 
