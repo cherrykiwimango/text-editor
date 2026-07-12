@@ -305,10 +305,19 @@ void editorDrawRows(struct abuf *ab){
     } 
     abAppend(ab, "\x1b[K", 3);
 
-    if(y < E.screenrows - 1){
-      abAppend(ab, "\r\n", 2);
-    }
+    abAppend(ab, "\r\n", 2);
   }
+  abAppend(ab, "\r\n", 4);
+}
+
+void editorDrawStatusBar(struct abuf *ab){
+  abAppend(ab, "\x1b[7m", 4);
+  int len = 0;
+  while (len < E.screencols) {
+    abAppend(ab, " ", 1);
+    len++;
+  }
+  abAppend(ab, "\x1b[m", 3);
 }
 
 void editorRefreshScreen(){
@@ -319,6 +328,7 @@ void editorRefreshScreen(){
   abAppend(&ab, "\x1b[H", 3);
 
   editorDrawRows(&ab);
+  editorDrawStatusBar(&ab);
 
   char buffer[32];
   snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
@@ -420,6 +430,7 @@ void initEditor(){
   E.row = NULL;
 
   if(getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
+  E.screenrows -= 2;
 }
 
 int main(int argc, char *argv[]) {
