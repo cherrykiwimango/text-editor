@@ -385,9 +385,13 @@ void editorProcessKeyPress(){
       break;
     case HOME_KEY:
       E.cx = 0;
+      E.verticalcx = E.cx;
       break;
     case END_KEY:
-      E.cx = E.screencols - 1;
+      if(E.cy < E.numrows){
+        E.cx = E.row[E.cy].rsize;
+        E.verticalcx = E.cx;
+      }
       break;
     case PAGE_UP:
       E.cy = E.rowoff;
