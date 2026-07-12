@@ -390,10 +390,11 @@ void editorProcessKeyPress(){
       E.cx = E.screencols - 1;
       break;
     case PAGE_UP:
-      E.cy = 0;
+      E.cy = E.rowoff;
       break;
     case PAGE_DOWN:
-      E.cy = E.screenrows - 1;
+      E.cy = E.screenrows + E.rowoff - 1;
+      if(E.cy > E.numrows) E.cy = E.numrows;
       break;
     case ARROW_UP:
     case ARROW_DOWN:
