@@ -15,6 +15,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdarg.h>
+#include <fcntl.h>
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
@@ -241,6 +242,26 @@ void editorInsertChar(int c){
 
 /*** file i/o ***/
 
+char *editorRowsToString(int *buflen){
+  int len = 0;
+  for(int i=0; i<E.numrows; i++){
+    len += E.row[i].size + 1;
+  }
+  *buflen = len;
+
+  char *buf = malloc(len);
+  char *p = buf;
+
+  for(int j=0; j<E.numrows; j++){
+    memcpy(p, E.row[j].chars, E.row[j].size);
+    p += E.row[j].size;
+    *p = '\n';
+    p++;
+  }
+
+  return buf;
+}
+
 void editorOpen(char *filename){
   free(E.filename);
   E.filename = strdup(filename);
@@ -259,6 +280,18 @@ void editorOpen(char *filename){
   }
   free(line);
   fclose(fp);
+}
+
+void editorSave(){
+  if(E.filename == NULL) return;
+
+  int len;
+  char *buf = editorRowsToString(&len);;
+  int fd = open(E.filename, O_CREAT | O_RDWR, 0644);
+  ftruncate(fd, len);
+  write(fd, buf, len);
+  close(fd);
+  free(buf);
 }
 
 /*** append buffer ***/
@@ -442,6 +475,9 @@ void editorProcessKeyPress(){
   switch(c) {
     case '\r':
       //TODO 
+      break;
+    case CTRL_KEY('s'):
+      editorSave();
       break;
     case CTRL_KEY('q'):
       write(STDOUT_FILENO, "\x1b[2J", 4);
