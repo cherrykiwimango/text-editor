@@ -1,6 +1,7 @@
 # Text Editor
 
-A text editor built from scratch in C, following Antirez's Kilo editor tutorial.
+A text editor built from scratch in C, following the build-your-own-x tutorial for Antirez's Kilo editor.
+[build your own editor in C](https://viewsourcecode.org/snaptoken/kilo/index.html)
 
 ## Installation
 
