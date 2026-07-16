@@ -473,6 +473,16 @@ void editorDrawStatusBar(struct abuf *ab){
   abAppend(ab, "\r\n", 2);
 }
 
+void editorSetStatusMessage(const char *fmt, ...){
+  va_list arg;
+  va_start(arg, fmt);
+
+  vsnprintf(E.statusmsg, sizeof(E.statusmsg), fmt, arg);
+  va_end(arg);
+
+  E.statusmsg_time = time(NULL);
+}
+
 void editorDrawMessageBar(struct abuf *ab){
   abAppend(ab, "\x1b[K", 3);
   int msglen = strlen(E.statusmsg);
@@ -501,16 +511,6 @@ void editorRefreshScreen(){
   abFree(&ab);
 }
 
-void editorSetStatusMessage(const char *fmt, ...){
-  va_list arg;
-  va_start(arg, fmt);
-
-  vsnprintf(E.statusmsg, sizeof(E.statusmsg), fmt, arg);
-  va_end(arg);
-
-  E.statusmsg_time = time(NULL);
-}
-
 /*** input ***/
 
 char *editorPrompt(char *prompt){
@@ -524,7 +524,12 @@ char *editorPrompt(char *prompt){
     editorRefreshScreen();
 
     int c = editorReadKey();
-    if(c == '\r'){
+    if(c == '\x1b'){
+      editorSetStatusMessage("");
+      free(buf);
+      return NULL;
+    }
+    else if(c == '\r'){
       if(buflen != 0){
         editorSetStatusMessage("");
         return buf;
