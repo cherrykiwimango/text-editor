@@ -359,7 +359,7 @@ void editorOpen(char *filename){
 
 void editorSave(){
   if(E.filename == NULL){
-    E.filename = editorPrompt("Save as: %s   (ESC to Cancel)");
+    E.filename = editorPrompt("Save as: %s  (ESC to Cancel)");
     if(E.filename == NULL){
       editorSetStatusMessage("Save Aborted");
       return;
@@ -528,7 +528,13 @@ char *editorPrompt(char *prompt){
     editorRefreshScreen();
 
     int c = editorReadKey();
-    if(c == '\x1b'){
+    if(c == BACKSPACE || c == DEL_KEY || c == CTRL_KEY('h')){
+      if(buflen != 0){
+        buflen--;
+        buf[buflen] = '\0';
+      } 
+    }
+    else if(c == '\x1b'){
       editorSetStatusMessage("");
       free(buf);
       return NULL;
