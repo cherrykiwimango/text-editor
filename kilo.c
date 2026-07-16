@@ -385,6 +385,22 @@ void editorSave(){
   editorSetStatusMessage("Unable to save, I/O error: %s", strerror(errno));
 }
 
+void editorFind(){
+  char *query = editorPrompt("Search: %s  (ESC to Cancel)");
+  if(query == NULL) return;
+
+  for(int i=0; i<E.numrows; i++){
+    erow *row = &E.row[i];
+    char *match = strstr(row->chars, query);
+    if(match){
+      E.cy = i;
+      E.cx = match - row->chars;
+      break;
+    }
+  }
+  free(query);
+}
+
 /*** append buffer ***/
 struct abuf{
   char *b;
@@ -611,6 +627,9 @@ void editorProcessKeyPress(){
     case CTRL_KEY('s'):
       editorSave();
       break;
+    case CTRL_KEY('f'):
+      editorFind();
+      break;
     case CTRL_KEY('q'):
       if(E.dirty && quit_times > 0){
         editorSetStatusMessage("File has unsaved changes! Press Ctrl+Q %d more times to quit", quit_times);
@@ -690,7 +709,7 @@ int main(int argc, char *argv[]) {
     editorOpen(argv[1]);
   }
 
-  editorSetStatusMessage("HELP: Ctrl+S to save | Ctrl+Q to quit");
+  editorSetStatusMessage("HELP: Ctrl+S to save | Ctrl+Q to quit | Ctrl+F to Find");
 
   while(1){
     editorRefreshScreen();
